@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Finance Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>💰 Personal Finance Dashboard</h1>
+      <p>Track your income and expenses</p>
+    </header>
+
+    <!-- Summary Cards -->
+    <section class="summary-cards">
+      <div class="card total-income">
+        <h3>Total Income</h3>
+        <p class="amount" id="totalIncome">$0.00</p>
+      </div>
+      <div class="card total-expenses">
+        <h3>Total Expenses</h3>
+        <p class="amount" id="totalExpenses">$0.00</p>
+      </div>
+      <div class="card balance" id="balanceCard">
+        <h3>Balance</h3>
+        <p class="amount" id="balance">$0.00</p>
+      </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="charts-section">
+      <div class="chart-container">
+        <h2>Income vs Expenses</h2>
+        <canvas id="incomeExpenseChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h2>Expense Breakdown by Category</h2>
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="content">
+      <!-- Income Section -->
+      <section class="section income-section">
+        <h2>Income</h2>
+        <form id="incomeForm" class="form">
+          <input type="text" id="incomeSource" placeholder="Income Source (e.g., Salary)" required>
+          <input type="number" id="incomeAmount" placeholder="Amount" step="0.01" required>
+          <input type="date" id="incomeDate" required>
+          <button type="submit" class="btn btn-primary">Add Income</button>
+        </form>
+
+        <div class="list-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Source</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="incomeList"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Expenses Section -->
+      <section class="section expense-section">
+        <h2>Expenses</h2>
+        <form id="expenseForm" class="form">
+          <select id="expenseCategory" required>
+            <option value="">Select Category</option>
+            <option value="Food">Food & Groceries</option>
+            <option value="Transportation">Transportation</option>
+            <option value="Utilities">Utilities</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Education">Education</option>
+            <option value="Other">Other</option>
+          </select>
+          <input type="text" id="expenseDescription" placeholder="Description (optional)">
+          <input type="number" id="expenseAmount" placeholder="Amount" step="0.01" required>
+          <input type="date" id="expenseDate" required>
+          <button type="submit" class="btn btn-primary">Add Expense</button>
+        </form>
+
+        <div class="list-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="expenseList"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
