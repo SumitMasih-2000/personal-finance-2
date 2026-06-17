@@ -3,7 +3,6 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import IsolationForest
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -38,7 +37,6 @@ class FinancialAnalyzer:
         if len(expenses) < 5:
             return pd.DataFrame()
         
-        # Calculate z-score for amounts
         mean = expenses['Amount'].mean()
         std = expenses['Amount'].std()
         expenses['z_score'] = np.abs((expenses['Amount'] - mean) / std)
@@ -53,7 +51,6 @@ class FinancialAnalyzer:
         
         recommendations = []
         
-        # Recommendation 1: Highest spending category
         if len(category_spending) > 0:
             top_category = category_spending.index[0]
             top_amount = category_spending.iloc[0]
@@ -63,7 +60,6 @@ class FinancialAnalyzer:
                 'action': f'Consider reducing {top_category} expenses by 10-15%'
             })
         
-        # Recommendation 2: Subscriptions (if any)
         subscriptions = expenses[expenses['Category'] == 'Subscriptions']
         if len(subscriptions) > 0:
             sub_total = subscriptions['Amount'].sum()
@@ -73,7 +69,6 @@ class FinancialAnalyzer:
                 'action': 'Review and cancel unused subscriptions'
             })
         
-        # Recommendation 3: Dining out frequency
         dining = expenses[expenses['Category'] == 'Food & Dining']
         if len(dining) > 10:
             dining_total = dining['Amount'].sum()
@@ -89,9 +84,8 @@ class FinancialAnalyzer:
         """Calculate overall financial health (0-100)"""
         metrics = self.get_overview_metrics()
         
-        score = 50  # Base score
+        score = 50
         
-        # Savings rate (0-30 points)
         savings_rate = metrics['savings_rate']
         if savings_rate >= 20:
             score += 30
@@ -102,7 +96,6 @@ class FinancialAnalyzer:
         elif savings_rate >= 5:
             score += 10
         
-        # Income stability (0-20 points)
         income_df = self.df[self.df['Type'] == 'Income']
         monthly_income = income_df.groupby(income_df['Date'].dt.to_period('M'))['Amount'].sum()
         if len(monthly_income) > 1:
@@ -116,7 +109,6 @@ class FinancialAnalyzer:
             elif cv < 0.6:
                 score += 10
         
-        # Expense control (0-20 points)
         expenses_df = self.df[self.df['Type'] == 'Expense']
         monthly_expenses = expenses_df.groupby(expenses_df['Date'].dt.to_period('M'))['Amount'].sum()
         if len(monthly_expenses) > 1:
@@ -130,29 +122,24 @@ class FinancialAnalyzer:
     
     def forecast_next_month(self):
         """Forecast next month's expenses and income"""
-        # Expense forecast
         expense_df = self.df[self.df['Type'] == 'Expense'].copy()
         expense_df['date_num'] = (expense_df['Date'] - expense_df['Date'].min()).dt.days
         
         if len(expense_df) > 10:
-            X = expense_df['date_num'].values.reshape(-1, 1)
-            y = expense_df.groupby('date_num')['Amount'].sum().values
-            
-            if len(y) > 3:
+            try:
                 model = LinearRegression()
                 model.fit(expense_df['date_num'].values.reshape(-1, 1), 
                          expense_df['Amount'].values)
                 next_days = np.arange(expense_df['date_num'].max(), 
                                      expense_df['date_num'].max() + 30).reshape(-1, 1)
                 forecast_expense = model.predict(next_days).sum()
-            else:
+            except:
                 forecast_expense = expense_df['Amount'].sum() / 12
         else:
-            forecast_expense = expense_df['Amount'].sum() / 12
+            forecast_expense = expense_df['Amount'].sum() / 12 if len(expense_df) > 0 else 0
         
-        # Income forecast
         income_df = self.df[self.df['Type'] == 'Income'].copy()
-        forecast_income = income_df['Amount'].sum() / 12
+        forecast_income = income_df['Amount'].sum() / 12 if len(income_df) > 0 else 0
         
         return {
             'predicted_expenses': max(0, forecast_expense),
